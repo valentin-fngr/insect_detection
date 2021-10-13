@@ -33,7 +33,7 @@ def serialize_sample(label_path):
     width = data["asset"]["size"]["width"]
     height = data["asset"]["size"]["height"]
 
-    img = tf.image.resize(img, (448,448,3))
+    img = tf.image.resize(img, (448,448))
     img = tf.cast(img, dtype=tf.uint8)
     encoded_image = tf.io.encode_jpeg(img).numpy() # encode to bytes
 
@@ -46,10 +46,10 @@ def serialize_sample(label_path):
 
     for region in regions: 
 
-        heights.append(int(region["boundingBox"]["height"]) / 448) 
-        widths.append(int(region["boundingBox"]["width"]) / 448) 
-        lefts.append(int(region["boundingBox"]["left"]) / 448)
-        tops.append(int(region["boundingBox"]["top"]) / 448)
+        heights.append(int(region["boundingBox"]["height"]/ height)) 
+        widths.append(int(region["boundingBox"]["width"]/ width)) 
+        lefts.append(int(region["boundingBox"]["left"]/ width))
+        tops.append(int(region["boundingBox"]["top"]/ height))
         obj_labels.append(labels.index(region["tags"][0]))
 
     feature = {
@@ -86,8 +86,9 @@ def create_tf_records(annot_path_list, label, num_sample=200, tfrecords_dir=tfre
                 try:
                     serialized_example = serialize_sample(sample) 
                     writer.write(serialized_example)
-                except (ValueError, Exception): 
+                except (ValueError, Exception) as e: 
                     print("couldn't serialize example for image :", sample)
+                    print(e)
                     removed += 1
             print("couldn't load", removed)
             print(f"Successfuly created tf record file file_{i}_{len(sample_path) - removed}_{label}.tfrecords")
