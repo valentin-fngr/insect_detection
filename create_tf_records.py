@@ -27,13 +27,15 @@ def serialize_sample(label_path):
 
     img = tf.io.read_file(image_path) 
     img = tf.image.decode_png(img)
-    img = tf.cast(img, dtype=tf.uint8)
-    encoded_image = tf.io.encode_jpeg(img).numpy() # encode to bytes
 
     regions = data["regions"]
-    width = data["asset"]["size"]["width"]
-    height = data["asset"]["size"]["height"] 
 
+    width = data["asset"]["size"]["width"]
+    height = data["asset"]["size"]["height"]
+
+    img = tf.image.resize(img, (448,448,3))
+    img = tf.cast(img, dtype=tf.uint8)
+    encoded_image = tf.io.encode_jpeg(img).numpy() # encode to bytes
 
     obj_labels = [] 
     heights = [] 
@@ -44,15 +46,13 @@ def serialize_sample(label_path):
 
     for region in regions: 
 
-        heights.append(int(region["boundingBox"]["height"])) 
-        widths.append(int(region["boundingBox"]["width"])) 
-        lefts.append(int(region["boundingBox"]["left"]))
-        tops.append(int(region["boundingBox"]["top"]))
+        heights.append(int(region["boundingBox"]["height"]) / 448) 
+        widths.append(int(region["boundingBox"]["width"]) / 448) 
+        lefts.append(int(region["boundingBox"]["left"]) / 448)
+        tops.append(int(region["boundingBox"]["top"]) / 448)
         obj_labels.append(labels.index(region["tags"][0]))
 
     feature = {
-        "image/height" :  tf.train.Feature(int64_list=tf.train.Int64List(value=[height])),
-        "image/width" : tf.train.Feature(int64_list=tf.train.Int64List(value=[width])),
         "image/encoded" : tf.train.Feature(bytes_list=tf.train.BytesList(value=[encoded_image])),
         "image/obj/heights": tf.train.Feature(int64_list=tf.train.Int64List(value=heights)), 
         "image/obj/widths": tf.train.Feature(int64_list=tf.train.Int64List(value=widths)),
