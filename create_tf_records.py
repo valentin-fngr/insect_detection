@@ -46,18 +46,18 @@ def serialize_sample(label_path):
 
     for region in regions: 
 
-        heights.append(int(region["boundingBox"]["height"]/ height)) 
-        widths.append(int(region["boundingBox"]["width"]/ width)) 
-        lefts.append(int(region["boundingBox"]["left"]/ width))
-        tops.append(int(region["boundingBox"]["top"]/ height))
+        heights.append(region["boundingBox"]["height"]/ height) 
+        widths.append(region["boundingBox"]["width"]/ width) 
+        lefts.append(region["boundingBox"]["left"]/ width)
+        tops.append(region["boundingBox"]["top"]/ height)
         obj_labels.append(labels.index(region["tags"][0]))
 
     feature = {
         "image/encoded" : tf.train.Feature(bytes_list=tf.train.BytesList(value=[encoded_image])),
-        "image/obj/heights": tf.train.Feature(int64_list=tf.train.Int64List(value=heights)), 
-        "image/obj/widths": tf.train.Feature(int64_list=tf.train.Int64List(value=widths)),
-        "image/obj/lefts": tf.train.Feature(int64_list=tf.train.Int64List(value=tops)),
-        "image/obj/tops": tf.train.Feature(int64_list=tf.train.Int64List(value=lefts)), 
+        "image/obj/heights": tf.train.Feature(float_list=tf.train.FloatList(value=heights)), 
+        "image/obj/widths": tf.train.Feature(float_list=tf.train.FloatList(value=widths)),
+        "image/obj/lefts": tf.train.Feature(float_list=tf.train.FloatList(value=tops)),
+        "image/obj/tops": tf.train.Feature(float_list=tf.train.FloatList(value=lefts)), 
         "image/obj/class_id": tf.train.Feature(int64_list=tf.train.Int64List(value=obj_labels)), 
     }
 
