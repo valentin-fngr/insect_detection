@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np 
 import matplotlib.pyplot as plt 
 import json
+import matplotlib.patches as patches
 
 DATASET_ROOT = os.path.join(os.getcwd(), "dataset/ArTaxOr")
 
@@ -56,10 +57,16 @@ def serialize_sample(label_path):
         "image/encoded" : tf.train.Feature(bytes_list=tf.train.BytesList(value=[encoded_image])),
         "image/obj/heights": tf.train.Feature(float_list=tf.train.FloatList(value=heights)), 
         "image/obj/widths": tf.train.Feature(float_list=tf.train.FloatList(value=widths)),
+        # IMPORTANT ! In the tf records, we inverted TOPS and LEFTS ! 
+        # See the jupyter notebook
         "image/obj/lefts": tf.train.Feature(float_list=tf.train.FloatList(value=tops)),
         "image/obj/tops": tf.train.Feature(float_list=tf.train.FloatList(value=lefts)), 
         "image/obj/class_id": tf.train.Feature(int64_list=tf.train.Int64List(value=obj_labels)), 
     }
+
+    #### testing 
+
+    ####
 
     features = tf.train.Features(feature=feature)
 
@@ -88,7 +95,7 @@ def create_tf_records(annot_path_list, label, num_sample=200, tfrecords_dir=tfre
                     writer.write(serialized_example)
                 except (ValueError, Exception) as e: 
                     print("couldn't serialize example for image :", sample)
-                    print(e)
+                    raise(e)
                     removed += 1
             print("couldn't load", removed)
             print(f"Successfuly created tf record file file_{i}_{len(sample_path) - removed}_{label}.tfrecords")
