@@ -95,7 +95,6 @@ def create_tf_records(annot_path_list, label, num_sample=200, tfrecords_dir=tfre
                     writer.write(serialized_example)
                 except (ValueError, Exception) as e: 
                     print("couldn't serialize example for image :", sample)
-                    raise(e)
                     removed += 1
             print("couldn't load", removed)
             print(f"Successfuly created tf record file file_{i}_{len(sample_path) - removed}_{label}.tfrecords")
