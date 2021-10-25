@@ -47,10 +47,10 @@ def serialize_sample(label_path):
 
     for region in regions: 
 
-        heights.append(region["boundingBox"]["height"]) 
-        widths.append(region["boundingBox"]["width"]) 
-        lefts.append(region["boundingBox"]["left"])
-        tops.append(region["boundingBox"]["top"])
+        heights.append((region["boundingBox"]["height"] / height)*448) 
+        widths.append((region["boundingBox"]["width"]/width)*448) 
+        lefts.append((region["boundingBox"]["left"] / width)*448)
+        tops.append((region["boundingBox"]["top"] / height)*448)
         obj_labels.append(labels.index(region["tags"][0]))
 
     feature = {
